@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Player Widget</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #volume-fill {
+            transition: height 0.1s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <audio id="audio-player"></audio>
+
+    <div class="w-full max-w-sm bg-gray-900 text-white rounded-xl shadow-2xl p-4 flex space-x-4 overflow-hidden">
+        
+        <div class="flex flex-col items-center justify-center space-y-2">
+            <div id="volume-track" class="w-2 h-32 bg-gray-700 rounded-full relative cursor-pointer">
+                <div id="volume-fill" class="w-full bg-blue-500 rounded-full absolute bottom-0" style="height: 24%;"></div>
+            </div>
+            <span id="volume-number" class="text-xs text-gray-400 font-medium">24</span>
+        </div>
+
+        <div class="flex flex-col flex-grow space-y-3 min-w-0">
+            
+            <div class="flex items-center space-x-3">
+                <img 
+                    src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=80&h=80&fit=crop&q=80" 
+                    onerror="this.src='https://placehold.co/80x80/1a202c/ffffff?text=ART'"
+                    alt="Album Art"
+                    class="w-20 h-20 rounded-md object-cover shadow-md flex-shrink-0"
+                >
+                <div class="flex-grow min-w-0">
+                    <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider truncate">TECHNOLOGY AND SCIENCE</p>
+                    <h2 class="text-lg font-bold text-white truncate" title="Awake The Science (truncated)">Awake The Science (t...</h2>
+                    <p class="text-sm text-gray-300">Kulakovka</p>
+                </div>
+            </div>
+
+            <div class="flex justify-center items-center space-x-8 pt-2">
+                <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors duration-200 text-2xl" aria-label="Previous Track">
+                    ⏮️
+                </button>
+                
+                <button id="play-pause-btn" class="text-white hover:text-gray-200 transition-colors duration-200 text-4xl" aria-label="Play Track">
+                    ▶️
+                </button>
+                
+                <button id="next-btn" class="text-gray-400 hover:text-white transition-colors duration-200 text-2xl" aria-label="Next Track">
+                    ⏭️
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const songs = [
+            'bgm1.mp3', 
+            'bgm2.mp3', 
+            'bgm3.mp3', 
+            'bgm4.mp3', 
+            'bgm5.mp3'
+        ];
+        let currentSongIndex = 0;
+
+        const audioPlayer = document.getElementById('audio-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        
+        const volumeTrack = document.getElementById('volume-track');
+        const volumeFill = document.getElementById('volume-fill');
+        const volumeNumber = document.getElementById('volume-number');
+        
+        let isPlaying = false; // Initial state is paused
+
+        audioPlayer.src = songs[currentSongIndex];
+        audioPlayer.volume = 0.24; // Match initial UI
+
+        
+        function loadSong(songIndex) {
+            currentSongIndex = songIndex;
+            audioPlayer.src = songs[currentSongIndex];
+            playSong(); // Automatically play the new song
+        }
+
+        function playSong() {
+            isPlaying = true;
+            audioPlayer.play();
+            playPauseBtn.textContent = '⏸️';
+            playPauseBtn.setAttribute('aria-label', 'Pause Track');
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            audioPlayer.pause();
+            playPauseBtn.textContent = '▶️';
+            playPauseBtn.setAttribute('aria-label', 'Play Track');
+        }
+
+
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            loadSong(currentSongIndex);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            loadSong(currentSongIndex);
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            nextBtn.click(); // Simulate a click on the next button
+        });
+
+        let isDragging = false;
+
+        function updateVolume(event) {
+            const rect = volumeTrack.getBoundingClientRect();
+            const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+            if (clientY === undefined) return;
+
+            let y = clientY - rect.top;
+            
+            let percentage = 100 - (y / rect.height) * 100;
+
+            if (percentage < 0) percentage = 0;
+            if (percentage > 100) percentage = 100;
+
+            volumeFill.style.height = percentage + '%';
+            volumeNumber.textContent = Math.round(percentage);
+            
+ 
+            audioPlayer.volume = percentage / 100;
+        }
+
+        volumeTrack.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updateVolume(e); // Update on initial click
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateVolume(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        volumeTrack.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            updateVolume(e);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                e.preventDefault(); 
+                updateVolume(e);
+            }
+        }, { passive: false }); // Need passive: false to call preventDefault
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+    </script>
+
+</body>
+</html>
+

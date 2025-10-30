@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Desk</title>
+  <link rel="icon" href="avatar.png" type="image/x-icon"/>
+  <link rel="shortcut icon" href="avatar.png" type="image/x-icon"/>
   <style>
     html, body { height: 100%; margin: 0; padding: 0; }
     body { overflow: hidden; background: #000; }
@@ -22,6 +24,7 @@
       will-change: transform;
       transform-origin: 50% 50%;
     }
+
     .camera.zoom {
       transform-origin: var(--focus-x) var(--focus-y);
       animation: camZoom 1s ease-in-out forwards;
@@ -37,10 +40,7 @@
       --main-color: rgb(0, 0, 0);
       --main-bg-color: rgba(0, 0, 0, 0.36);
       --pattern-color: rgba(0, 0, 0, 0.073);
-
-      /* change this rotation value */
       filter: hue-rotate(0deg);
-
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 0.5rem;
@@ -65,14 +65,12 @@
           rgba(0, 0, 0, 0) 100%
         ) 1;
       border-width: 1px 0 1px 0;
-      border-style: solid; /* ensure border-image renders */
+      border-style: solid;
       color: var(--main-color);
       padding: 1rem 3rem;
       font-weight: 700;
       font-size: 1.5rem;
-      transition: opacity .2s ease, background-size 0.2s ease-in-out, filter .2s ease;
-
-      /* keep original placement from prior design */
+      transition: opacity .3s ease, background-size 0.3s ease-in-out;
       position: absolute;
       top: 20%;
       left: 51%;
@@ -82,26 +80,25 @@
     }
 
     .button:hover {
-      background-size:
-        cover,
-        10px 10px,
-        10px 10px;
+      background-size: cover, 12px 12px, 12px 12px;
     }
+
     .button:active {
       filter: hue-rotate(250deg);
     }
 
     /* === Booting overlay (appears after camZoom ends) === */
     .boot-overlay {
-      position: fixed;          /* not scaled with .camera */
+      position: fixed;
       inset: 0;
       display: grid;
-      place-items: center;/* top center */
+      place-items: center;
       padding-top: min(12vh, 120px);
       z-index: 999;
-      pointer-events: none;     /* purely visual */
+      pointer-events: none;
       background: linear-gradient(180deg, rgba(0,0,0,.65), transparent 35%);
     }
+
     .boot-overlay[hidden] { display: none; }
 
     .boot-panel {
@@ -128,18 +125,47 @@
 
     .boot-text { font-weight: 700; font-size: 14px; }
 
+    /* Progress bar */
+    .progress-bar {
+      width: 80%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.2);
+      margin-top: 20px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: #fff;
+      width: 100%;
+      border-radius: 4px;
+      transition: width 0.1s linear;
+    }
+
     /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
       .camera.zoom { animation-duration: 0.001s; }
-      .spinner { animation-duration: 2.5s; } /* slower but still visible */
+      .spinner { animation-duration: 2.5s; }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .button {
+        font-size: 1.2rem;
+        padding: 1rem 2rem;
+      }
+      .camera {
+        background-position: top;
+      }
     }
   </style>
 </head>
 <body>
 
   <!-- Scene that zooms -->
-  <div class="camera" id="camera">
-    <button class="button" id="startBtn" type="button"> Click to run the computer</button>
+  <div class="camera" id="camera" aria-live="polite">
+    <button class="button" id="startBtn" type="button" aria-label="Click to run the computer">Click to run the computer</button>
   </div>
 
   <!-- Booting overlay (spinner ABOVE the text) -->
@@ -147,13 +173,19 @@
     <div class="boot-panel">
       <div class="spinner" role="status" aria-label="Loading"></div>
       <div class="boot-text">Booting…</div>
+      <!-- Progress bar -->
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    const camera   = document.getElementById('camera');
-    const btn      = document.getElementById('startBtn');
-    const overlay  = document.getElementById('bootOverlay');
+    const camera = document.getElementById('camera');
+    const btn = document.getElementById('startBtn');
+    const overlay = document.getElementById('bootOverlay');
+    const progressBar = document.querySelector('.progress');
+    let timeLeft = 2;
 
     function startSequence() {
       // Avoid double-activations
@@ -165,20 +197,28 @@
       // Hide the button for a cleaner zoom
       btn.style.opacity = '0';
 
-      // Redirect after some time (kept at 5s as before)
-      setTimeout(() => {
-        window.location.href = 'booting.html';
-      }, 5000);
+      // Show the overlay after zooming completes
+      camera.addEventListener('animationend', (e) => {
+        if (e.animationName === 'camZoom') {
+          overlay.hidden = false;
+          startProgressBar();
+        }
+      }, { once: true });
     }
 
-    // Show overlay AFTER camZoom finishes
-    camera.addEventListener('animationend', (e) => {
-      if (e.animationName === 'camZoom') {
-        overlay.hidden = false;
-      }
-    }, { once: true });
+    // Start the progress bar and handle redirection
+    function startProgressBar() {
+      let timer = setInterval(() => {
+        timeLeft -= 0.1;
+        progressBar.style.width = `${(timeLeft / 5) * 100}%`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          window.location.href = 'booting.html';
+        }
+      }, 100);
+    }
 
-    // Trigger
+    // Trigger the sequence when the button is clicked
     btn.addEventListener('click', startSequence, { once: true });
   </script>
 </body>
