@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Moad Alouane • Cybersecurity Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg0:#1a120b;
+    --bg1:#120a06;
+    --panel:#1f140e;
+    --edge:#3b281b;
+    --accent:#d97706;
+    --accent2:#b45309;
+    --text:#f3e7dc;
+    --muted:#d1bfae;
+    --shadow:rgba(0,0,0,.6);
+    --grid:#2a1a12;
+  }
+  html,body{height:100%}
+  *{box-sizing:border-box}
+  body{margin:0;overflow:hidden;color:var(--text);cursor:none;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;background:radial-gradient(1600px 1000px at 72% 10%,#2b1a11 0%,#1d120b 40%,var(--bg0) 75%),var(--bg1)}
+  #stage{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,#110a07 0%,#140d08 100%)}
+  #bg{width:100%;height:100%;display:block}
+  .fallback-grid{position:absolute;inset:0;background:linear-gradient(transparent 26px,var(--grid) 27px),linear-gradient(90deg,transparent 26px,var(--grid) 27px);background-size:27px 27px;opacity:.2}
+  .desktop{position:relative;z-index:2;height:100vh;width:100vw}
+  .icons{position:absolute;inset:0 0 42px 0;padding:56px 16px 90px 16px}
+  .icon{position:absolute;width:96px;text-align:center;border:0;background:transparent;color:inherit;user-select:none}
+  .icon .glyph{width:72px;height:72px;margin:0 auto 6px;display:grid;place-items:center;border:1px solid #53331d;border-radius:14px;background:#24170ea8;box-shadow:0 12px 22px var(--shadow),inset 0 0 0 1px #2a1a12}
+  .icon .glyph svg{width:40px;height:40px;fill:var(--accent)}
+  .icon .label{font-size:12px;color:#f7efe6;text-shadow:0 1px 0 #000}
+  .icon:focus-visible .glyph{outline:2px solid var(--accent);outline-offset:3px}
+  .win{position:absolute;min-width:260px;min-height:170px;max-width:96vw;max-height:84vh;background:linear-gradient(180deg,rgba(40,26,18,.96) 0%,rgba(30,20,14,.96) 100%);border:1px solid var(--edge);border-radius:16px;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6),0 1px 0 #2f1e13 inset;transform:translate3d(0,0,0);transition:box-shadow .25s ease,transform .22s ease,opacity .18s ease}
+  .win.hidden{opacity:0;transform:translate3d(0,-12px,0) scale(.98);pointer-events:none}
+  .win.min{opacity:0;transform:translate3d(0,6px,0) scale(.98);pointer-events:none}
+  .head{height:42px;display:flex;align-items:center;gap:10px;padding:0 10px;border-bottom:1px solid #53331d;background:linear-gradient(180deg,#2b1b12 0%,#1f130c 100%);cursor:grab;user-select:none}
+  .head:active{cursor:grabbing}
+  .controls{display:flex;gap:6px}
+  .btn{width:24px;height:24px;border-radius:7px;background:#2b1a11;border:1px solid #6b462b;color:#ffe9d4;font-weight:700;line-height:18px;display:grid;place-items:center;box-shadow:0 0 0 1px #2d1b11 inset}
+  .btn:hover{filter:brightness(1.06)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn.close{background:#2a1a12;border-color:#8a5a34;color:#ffd6c2}
+  .titlebar{color:#f7efe6;font-weight:700;letter-spacing:.03em;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .body{padding:12px;height:calc(100% - 42px);overflow:auto}
+  .resize-h{position:absolute}
+  .r-n{top:-4px;left:8px;right:8px;height:8px;cursor:n-resize}
+  .r-s{bottom:-4px;left:8px;right:8px;height:8px;cursor:s-resize}
+  .r-e{top:8px;right:-4px;bottom:8px;width:8px;cursor:e-resize}
+  .r-w{top:8px;left:-4px;bottom:8px;width:8px;cursor:w-resize}
+  .r-ne{top:-4px;right:-4px;width:10px;height:10px;cursor:ne-resize}
+  .r-nw{top:-4px;left:-4px;width:10px;height:10px;cursor:nw-resize}
+  .r-se{bottom:-4px;right:-4px;width:10px;height:10px;cursor:se-resize}
+  .r-sw{bottom:-4px;left:-4px;width:10px;height:10px;cursor:sw-resize}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid #5a3a22;background:#22160f;border-radius:999px;padding:6px 10px;color:#f1e4d9;text-decoration:none}
+  .list{padding-left:18px;line-height:1.6;color:var(--muted)}
+  .project{border:1px solid #52341f;border-radius:12px;padding:10px;background:#23170f;margin-bottom:10px}
+  .ctx{position:fixed;z-index:20;min-width:200px;border:1px solid #4c311e;border-radius:10px;overflow:hidden;background:linear-gradient(180deg,#2a1b12 0%,#22160f 100%);box-shadow:0 12px 36px rgba(0,0,0,.55);display:none}
+  .ctx button{display:block;width:100%;background:transparent;color:#f3e7dc;text-align:left;padding:10px 12px;border:0;font-family:inherit;font-size:13px}
+  .ctx button:hover,.ctx button:focus{background:#2d1d13;outline:2px solid #d9770633}
+  .cursor{position:fixed;z-index:40;width:18px;height:18px;pointer-events:none;mix-blend-mode:screen;transform:translate(-50%,-50%)}
+  .cursor::before{content:"";position:absolute;inset:0;border:1px solid var(--accent);border-radius:50%;box-shadow:0 0 8px rgba(217,119,6,.35)}
+  .cursor::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);background:radial-gradient(circle,var(--accent) 0 1px,transparent 2px);box-shadow:0 0 8px rgba(217,119,6,.25)}
+  button:focus-visible,.icon:focus-visible,.win:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .taskbar{position:fixed;left:8px;right:8px;bottom:8px;height:40px;z-index:30;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;background:linear-gradient(180deg,#2b1b12 0%,#1f130c 100%);border:1px solid var(--edge);box-shadow:0 14px 38px rgba(0,0,0,.5)}
+  .start-btn{background:#2b1a11;border:1px solid #6b462b;color:#ffe9d4;border-radius:10px;padding:8px 12px;font-weight:700}
+  .tasks{display:flex;gap:6px;flex:1;overflow:auto}
+  .task{background:#24170f;border:1px solid #5a3a22;color:#f1e4d9;border-radius:8px;padding:6px 10px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+  .clock{color:var(--muted);font-variant-numeric:tabular-nums;padding:0 6px}
+  .start{position:fixed;left:8px;bottom:56px;width:260px;z-index:35;border:1px solid var(--edge);border-radius:12px;background:linear-gradient(180deg,#2b1b12 0%,#1f130c 100%);box-shadow:0 18px 44px rgba(0,0,0,.6);display:none}
+  .start.visible{display:block}
+  .start h4{margin:10px 12px 6px 12px}
+  .start .menu{display:grid;gap:6px;padding:6px 8px}
+  .start .menu button{background:#24170f;border:1px solid #5a3a22;color:#ffe9d4;border-radius:8px;padding:8px 10px;text-align:left}
+  .emblem{position:fixed;left:14px;top:12px;z-index:3;opacity:.8;user-select:none;pointer-events:none}
+  .emblem b{color:var(--accent)}
+  @media (max-width:680px){.icon{width:82px}.icon .glyph{width:64px;height:64px}.icon .label{font-size:11px}.win{max-width:96vw;max-height:78vh}}
+</style>
+</head>
+<body>
+  <div id="stage" aria-hidden="true">
+    <canvas id="bg"></canvas>
+    <div id="fallbackGrid" class="fallback-grid"></div>
+  </div>
+  <div class="desktop" id="desktop" tabindex="-1" aria-label="Desktop">
+    <div class="icons" id="icons"></div>
+  </div>
+  <div class="taskbar" id="taskbar">
+    <button class="start-btn" id="startBtn">● Start</button>
+    <div class="tasks" id="tasks"></div>
+    <div class="clock" id="clock"></div>
+  </div>
+  <div class="start" id="startMenu">
+    <h4 style="margin-top:10px">Quick Actions</h4>
+    <div class="menu">
+      <button data-act="open-files">Open File Manager</button>
+      <button data-act="open-about">About</button>
+      <button data-act="arrange">Arrange Icons</button>
+      <button data-act="toggle3d">Toggle 3D Background</button>
+      <button data-act="theme1">Preset: Dark Amber</button>
+      <button data-act="theme2">Preset: Copper</button>
+      <button data-act="reset-layout">Reset Layout</button>
+      <button data-act="closeall">Close All Windows</button>
+    </div>
+  </div>
+  <div class="ctx" id="ctxMenu" role="menu" aria-hidden="true">
+    <button type="button" data-action="arrange">Arrange Icons</button>
+    <button type="button" data-action="open-files">Open File Manager</button>
+    <button type="button" data-action="toggle3d">Toggle 3D</button>
+    <button type="button" data-action="closeall">Close All Windows</button>
+  </div>
+  <div class="emblem" aria-hidden="true"><b>MOAD</b> • Portfolio</div>
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script>
+  (()=>{
+    "use strict";
+    const $=(s,e=document)=>e.querySelector(s);const $$=(s,e=document)=>[...e.querySelectorAll(s)];const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));const lerp=(a,b,t)=>a+(b-a)*t;const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+    const prefs=store.get('prefs',{three:true,grid:0.2,theme:'amber',colors:{bg0:'#1a120b',bg1:'#120a06',panel:'#1f140e',edge:'#3b281b',accent:'#d97706',accent2:'#b45309',text:'#f3e7dc',muted:'#d1bfae',grid:'#2a1a12'}});
+    function applyTheme(c){const r=document.documentElement;Object.entries(c).forEach(([k,v])=>r.style.setProperty('--'+k,v))}
+    applyTheme(prefs.colors);
+    const clockEl=$('#clock');const tickClock=()=>{const d=new Date();const p=v=>String(v).padStart(2,'0');clockEl.textContent=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`};setInterval(tickClock,1000);tickClock();
+    const bgCanvas=$('#bg');let renderer,scene,camera,group,stars,animId,mouseX=0,mouseY=0;function init3D(){if(!window.THREE)return;renderer=new THREE.WebGLRenderer({canvas:bgCanvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,1000);camera.position.set(0,10,40);const amb=new THREE.AmbientLight(0xd97706,0.22);scene.add(amb);const dir=new THREE.DirectionalLight(0xb45309,0.34);dir.position.set(30,40,20);scene.add(dir);group=new THREE.Group();scene.add(group);const ico=new THREE.IcosahedronGeometry(14,1);const wire=new THREE.MeshBasicMaterial({color:0xd97706,wireframe:true,transparent:true,opacity:0.22});const m1=new THREE.Mesh(ico,wire);group.add(m1);const torus=new THREE.TorusGeometry(22,0.5,10,180);const wire2=new THREE.MeshBasicMaterial({color:0xb45309,wireframe:true,transparent:true,opacity:0.18});const ring=new THREE.Mesh(torus,wire2);ring.rotation.x=Math.PI/3;group.add(ring);const count=780;const geo=new THREE.BufferGeometry();const pos=new Float32Array(count*3);for(let i=0;i<count;i++){pos[i*3]=(Math.random()-0.5)*160;pos[i*3+1]=(Math.random()-0.5)*100;pos[i*3+2]=(Math.random()-0.5)*160}geo.setAttribute('position',new THREE.BufferAttribute(pos,3));const mat=new THREE.PointsMaterial({color:0xd97706,size:1.2,transparent:true,opacity:0.38});stars=new THREE.Points(geo,mat);scene.add(stars);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});addEventListener('pointermove',e=>{mouseX=(e.clientX/innerWidth-.5);mouseY=(e.clientY/innerHeight-.5)},{passive:true});const animate=()=>{animId=requestAnimationFrame(animate);group.rotation.x+=0.001+mouseY*0.02;group.rotation.y+=0.002+mouseX*0.03;stars.rotation.y+=0.0006;stars.rotation.x+=0.0003;camera.lookAt(0,0,0);renderer.render(scene,camera)};animate();$('#fallbackGrid').style.opacity=prefs.grid}
+    if(prefs.three){try{init3D()}catch(e){}}
+    const iconsWrap=$('#icons');
+    const ICONS=[
+      {id:'about',label:'About Me',svg:`<svg viewBox='0 0 24 24'><path d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/></svg>`},
+      {id:'projects',label:'Projects',svg:`<svg viewBox='0 0 24 24'><path d='M3 5h18v4H3V5zm0 5h18v9H3v-9zm2 2v5h6v-5H5zm8 0v5h6v-5h-6z'/></svg>`},
+      {id:'skills',label:'Skills',svg:`<svg viewBox='0 0 24 24'><path d='M12 2l3 6 6 .9-4.5 4.3L17 20l-5-2.6L7 20l1.5-6.8L4 8.9 10 8l2-6z'/></svg>`},
+      {id:'awards',label:'Awards',svg:`<svg viewBox='0 0 24 24'><path d='M17 3H7a2 2 0 0 0-2 2v14l7-3 7 3V5a2 2 0 0 0-2-2z'/></svg>`},
+      {id:'resume',label:'Resume',svg:`<svg viewBox='0 0 24 24'><path d='M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V7h3.5L14 3.5zM7 9h10v2H7V9zm0 4h10v2H7v-2zm0 4h6v2H7v-2z'/></svg>`},
+      {id:'contact',label:'Contact',svg:`<svg viewBox='0 0 24 24'><path d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5L4 8V6l8 5 8-5v2z'/></svg>`},
+      {id:'files',label:'File Manager',svg:`<svg viewBox='0 0 24 24'><path d='M10 4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h6zM4 8v10h16V8H4z'/></svg>`}
+    ];
+    const saved=store.get('iconPositions_orange',{});
+    function setIconPos(el,x,y){el.style.left=x+"px";el.style.top=y+"px"}
+    function createIcon(meta,idx){const d=document.createElement('button');d.className='icon';d.type='button';d.id='icon-'+meta.id;d.setAttribute('aria-label',meta.label);d.innerHTML=`<div class="glyph">${meta.svg}</div><div class="label">${meta.label}</div>`;const col=Math.floor(idx%6),row=Math.floor(idx/6);const def={x:18+col*108,y:64+row*112};const pos=saved[meta.id]||def;setIconPos(d,pos.x,pos.y);let last=0;d.addEventListener('click',()=>{const now=Date.now();if(now-last<300){openWindow(meta.id);last=0}else last=now});d.addEventListener('dblclick',()=>openWindow(meta.id));d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){openWindow(meta.id);e.preventDefault()}});makeDraggableIcon(d,meta.id);iconsWrap.appendChild(d)}
+    ICONS.forEach(createIcon);
+    function makeDraggableIcon(el,key){let sx=0,sy=0,ox=0,oy=0,drag=false;const down=e=>{const p=pointer(e);drag=true;sx=p.x;sy=p.y;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;el.setPointerCapture?.(e.pointerId)};const move=e=>{if(!drag)return;const p=pointer(e);const nx=clamp(ox+(p.x-sx),4,innerWidth-el.offsetWidth-4);const ny=clamp(oy+(p.y-sy),56,innerHeight-el.offsetHeight-52);setIconPos(el,nx,ny)};const up=e=>{if(!drag)return;drag=false;el.releasePointerCapture?.(e.pointerId);storePositions()};el.addEventListener('pointerdown',down);addEventListener('pointermove',move);addEventListener('pointerup',up)}
+    function storePositions(){const obj={};ICONS.forEach(m=>{const el=$('#icon-'+m.id);if(!el)return;obj[m.id]={x:parseFloat(el.style.left),y:parseFloat(el.style.top)}});store.set('iconPositions_orange',obj)}
+    const desktop=$('#desktop');let zTop=10;const windows=new Map();
+    function templateFor(id){switch(id){
+      case 'about':return{title:'About • Moad Alouane',w:520,h:340,content:`<div style="display:grid;gap:10px"><h3 style="margin:0;color:#f1e4d9">Hi, I'm <span style='color:#ffd7b0'>Moad Alouane</span></h3><p style="margin:0;color:var(--muted)">Cybersecurity and Computer Science student at Southwest Petroleum University (Chengdu, China). Focused on blue-team operations, threat hunting, and security automation. Building hands-on experience via CTFs and a homelab.</p><div class="chips"><span class="chip">C++</span><span class="chip">Python</span><span class="chip">Bash</span><span class="chip">Linux</span><span class="chip">Nmap</span><span class="chip">Wireshark</span><span class="chip">Metasploit</span></div></div>`};
+      case 'projects':return{title:'Projects',w:640,h:430,content:`<div class="project"><b>AI Gesture Control Suite</b> — Real-time hand tracking for cursor control, smart clicks/drag, and volume control.<br><small>Python, OpenCV, MediaPipe</small></div><div class="project"><b>University Life Simulation Game</b> — Low‑poly 3D simulation with stats, day/night, audio, and phone UI.<br><small>Unity 3D (C#)</small></div><div class="project"><b>Digital Balance Self‑Assessment Tool</b> — Bilingual web app for digital wellness with charts and PDF export.<br><small>HTML, CSS, JavaScript</small></div>`};
+      case 'skills':return{title:'Skills',w:540,h:360,content:`<h4 style="margin:0 0 8px 0">Programming</h4><div class="chips"><span class="chip">C++</span><span class="chip">Python</span><span class="chip">Java</span><span class="chip">Bash</span></div><h4 style="margin:12px 0 8px 0">Security & Tools</h4><div class="chips"><span class="chip">Linux</span><span class="chip">Kali Linux</span><span class="chip">Nmap</span><span class="chip">Wireshark</span><span class="chip">Metasploit</span><span class="chip">Git</span><span class="chip">VirtualBox</span></div><h4 style="margin:12px 0 8px 0">Soft Skills</h4><div class="chips"><span class="chip">Problem‑solving</span><span class="chip">Teamwork</span><span class="chip">Communication</span><span class="chip">Self‑learning</span></div>`};
+      case 'awards':return{title:'Awards & Certifications',w:560,h:400,content:`<h4 style='margin:0 0 6px 0'>Awards</h4><ul class="list"><li>First Prize — Chinese‑English Bilingual Recitation Championship (May 2025)</li><li>Third Prize — “Carelink” Project, International Entrepreneurship Contest (Dec 2024)</li></ul><h4 style='margin:8px 0 6px 0'>Certifications</h4><ul class="list"><li>IBM Cybersecurity Analyst Professional Certificate</li><li>Google Cybersecurity Professional Certificate</li><li>Cyber Security 101 — TryHackMe</li><li>Telstra AU — Cybersecurity Job Simulation (Forage)</li><li>Pre Security — TryHackMe</li></ul>`};
+      case 'resume':return{title:'Resume (Plaintext)',w:600,h:460,content:`<button class='chip' id='dlResume'>Download Resume.txt</button><pre style='margin-top:12px;padding:10px;border:1px solid #52341f;border-radius:10px;background:#23170f;color:#f1e4d9;white-space:pre-wrap'>MOAD ALOUANE\nCybersecurity & Computer Science Student | CTF Enthusiast | Aspiring Security Analyst\nSouthwest Petroleum University, Chengdu, China\nEmail: alouanemoad@gmail.com | Phone: +86 19138477535 | LinkedIn: linkedin.com/in/alouanemoad\n\nPROFILE\nProactive third-year CS student with foundations in software development, IT ops, and cybersecurity. Skilled in C++, Python, Bash, Linux, and security tools (Nmap, Wireshark, Metasploit). Preparing for Network+ and Security+ while building hands-on experience via CTFs and homelab projects.\n\nPROJECTS\n• AI Gesture Control Suite — Real-time hand tracking to control cursor, perform smart clicks/drag, volume control. (Python, OpenCV, MediaPipe)\n• University Life Simulation Game — Low-poly 3D PC sim with stats, day/night cycle, audio, phone UI. (Unity 3D / C#)\n• Digital Balance Self-Assessment Tool — Bilingual web app with charts, PDF export, i18n. (HTML/CSS/JS)\n\nAWARDS\n• First Prize — Chinese-English Bilingual Recitation Championship (May 2025)\n• Third Prize — “Carelink” Project, International Entrepreneurship Contest (Dec 2024)\n\nCERTIFICATIONS\n• IBM Cybersecurity Analyst | • Google Cybersecurity | • THM Cyber Security 101 | • Telstra AU (Forage) | • THM Pre Security\n\nSKILLS\nProgramming: C++, Python, Java, Bash\nSecurity Tools: Nmap, Wireshark, Linux, Metasploit\nOther: Git, VirtualBox, Kali Linux\n\nLANGUAGES\nArabic (Native) | English (Highly Proficient) | French (Working) | Chinese (Basic)</pre>`};
+      case 'contact':return{title:'Contact',w:500,h:300,content:`<div style='display:grid;gap:10px'><p style='margin:0;color:var(--muted)'>Open for internships, CTF teams, and security projects.</p><div class='chips'><a class='chip' href='mailto:alouanemoad@gmail.com'>alouanemoad@gmail.com</a><a class='chip' href='tel:+8619138477535'>+86 19138477535</a><a class='chip' href='https://www.linkedin.com/in/alouanemoad' target='_blank' rel='noopener'>LinkedIn</a></div><label>Quick message (demo):<br/><textarea style='width:100%;height:120px;background:#22160f;color:#f1e4d9;border:1px solid #52341f;border-radius:8px;padding:8px;font-family:inherit' placeholder='Type here...'></textarea></label></div>`};
+      case 'files':return{title:'File Manager',w:820,h:520,content:fileManagerHTML()};
+    }return{title:id,w:380,h:260,content:"<div>Unknown</div>"}
+    }
+    function openWindow(id){if(windows.has(id)){focusWindow(windows.get(id));return}const t=templateFor(id);const w=document.createElement('section');w.className='win hidden';w.id='win-'+id;w.tabIndex=0;w.setAttribute('role','dialog');w.style.left=(100+Math.random()*120)+'px';w.style.top=(84+Math.random()*80)+'px';w.style.width=t.w+'px';w.style.height=t.h+'px';w.innerHTML=`<div class="head" data-drag="1"><div class="controls"><button class="btn close" title="Close" aria-label="Close">×</button><button class="btn" data-min title="Minimize" aria-label="Minimize">—</button><button class="btn" data-max title="Maximize" aria-label="Maximize">▢</button></div><div class="titlebar">${t.title}</div></div><div class="body">${t.content}</div><div class="resize-h r-n"></div><div class="resize-h r-s"></div><div class="resize-h r-e"></div><div class="resize-h r-w"></div><div class="resize-h r-ne"></div><div class="resize-h r-nw"></div><div class="resize-h r-se"></div><div class="resize-h r-sw"></div>`;desktop.appendChild(w);requestAnimationFrame(()=>w.classList.remove('hidden'));const closeBtn=$('.btn.close',w);closeBtn.addEventListener('pointerdown',e=>{e.stopPropagation()});closeBtn.addEventListener('click',e=>{e.stopPropagation();closeWindow(id)});const minBtn=$('[data-min]',w);minBtn.addEventListener('pointerdown',e=>{e.stopPropagation()});minBtn.addEventListener('click',e=>{e.stopPropagation();toggleMin(w,id)});const maxBtn=$('[data-max]',w);maxBtn.addEventListener('pointerdown',e=>{e.stopPropagation()});maxBtn.addEventListener('click',e=>{e.stopPropagation();toggleMax(w)});$('.controls',w).addEventListener('pointerdown',e=>{e.stopPropagation()});makeDraggableWindow(w,$('.head',w));makeResizableWindow(w);w.addEventListener('mousedown',()=>focusWindow(w));w.addEventListener('touchstart',()=>focusWindow(w));w.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWindow(id)}});if(id==='resume'){const btn=$('#dlResume',w);if(btn)btn.addEventListener('click',downloadResume)}if(id==='files'){initFileManager(w)}windows.set(id,w);addTaskButton(id,t.title);focusWindow(w)}
+    function focusWindow(w){zTop+=1;w.style.zIndex=zTop;w.focus({preventScroll:true})}
+    function closeWindow(id){const w=windows.get(id);if(!w)return;w.classList.add('hidden');setTimeout(()=>{w.remove();windows.delete(id);removeTaskButton(id)},160)}
+    let maximized=new WeakSet();function toggleMax(w){if(maximized.has(w)){w.style.left=w.dataset.oldLeft;w.style.top=w.dataset.oldTop;w.style.width=w.dataset.oldW;w.style.height=w.dataset.oldH;maximized.delete(w)}else{w.dataset.oldLeft=w.style.left;w.dataset.oldTop=w.style.top;w.dataset.oldW=w.style.width;w.dataset.oldH=w.style.height;w.style.left='10px';w.style.top='10px';w.style.width=(innerWidth-20)+'px';w.style.height=(innerHeight-60)+'px';maximized.add(w)}}
+    function makeDraggableWindow(win,handle){let sx=0,sy=0,ox=0,oy=0,drag=false;const down=e=>{if(e.button===2)return;if(e.target.closest('.controls'))return;drag=true;const p=pointer(e);sx=p.x;sy=p.y;const r=win.getBoundingClientRect();ox=r.left;oy=r.top;handle.setPointerCapture?.(e.pointerId);focusWindow(win)};const move=e=>{if(!drag)return;const p=pointer(e);const nx=clamp(ox+(p.x-sx),0,innerWidth-win.offsetWidth);const ny=clamp(oy+(p.y-sy),0,innerHeight-win.offsetHeight-50);Object.assign(win.style,{left:nx+'px',top:ny+'px'})};const up=e=>{if(!drag)return;drag=false;handle.releasePointerCapture?.(e.pointerId);maybeSnap(win)};handle.addEventListener('pointerdown',down);addEventListener('pointermove',move);addEventListener('pointerup',up)}
+    function makeResizableWindow(win){const minW=260,minH=170;['n','s','e','w','ne','nw','se','sw'].forEach(edge=>{const el=$('.r-'+edge,win);let sx=0,sy=0,sl=0,st=0,sw=0,sh=0,active=false;const down=e=>{active=true;const p=pointer(e);sx=p.x;sy=p.y;const r=win.getBoundingClientRect();sl=r.left;st=r.top;sw=r.width;sh=r.height;el.setPointerCapture?.(e.pointerId);focusWindow(win)};const move=e=>{if(!active)return;const p=pointer(e);let dx=p.x-sx,dy=p.y-sy;let left=sl,top=st,w=sw,h=sh;if(edge.includes('e'))w=clamp(sw+dx,minW,innerWidth-sl);if(edge.includes('s'))h=clamp(sh+dy,minH,innerHeight-st-50);if(edge.includes('w')){w=clamp(sw-dx,minW,sw+sl);left=sl+(sw-w)}if(edge.includes('n')){h=clamp(sh-dy,minH,sh+st);top=st+(sh-h)}Object.assign(win.style,{left:left+'px',top:top+'px',width:w+'px',height:h+'px'})};const up=e=>{if(!active)return;active=false;el.releasePointerCapture?.(e.pointerId)};el.addEventListener('pointerdown',down);addEventListener('pointermove',move);addEventListener('pointerup',up)})}
+    function maybeSnap(win){const r=win.getBoundingClientRect();const m=12;if(Math.abs(r.left-0)<m)win.style.left='0px';if(Math.abs((innerWidth-(r.left+r.width)))<m)win.style.left=(innerWidth-r.width)+'px';if(Math.abs(r.top-0)<m)win.style.top='0px'}
+    function downloadResume(){const text=`MOAD ALOUANE\nCybersecurity & Computer Science Student\nEmail: alouanemoad@gmail.com\nLinkedIn: linkedin.com/in/alouanemoad`;const blob=new Blob([text],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Resume.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+    const tasks=$('#tasks');function addTaskButton(id,title){const b=document.createElement('button');b.className='task';b.dataset.id=id;b.textContent=title;b.addEventListener('click',()=>toggleMin(windows.get(id),id));tasks.appendChild(b)}function removeTaskButton(id){const b=tasks.querySelector(`[data-id="${id}"]`);if(b)b.remove()}
+    function toggleMin(w,id){if(!w)return;const isMin=w.classList.toggle('min');if(!isMin){focusWindow(w)}else{}}
+    const ctx=$('#ctxMenu');desktop.addEventListener('contextmenu',e=>{e.preventDefault();ctx.style.display='block';ctx.style.left=e.clientX+'px';ctx.style.top=e.clientY+'px';ctx.setAttribute('aria-hidden','false')});addEventListener('pointerdown',e=>{if(!ctx.contains(e.target)){ctx.style.display='none';ctx.setAttribute('aria-hidden','true')}});ctx.addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;const a=btn.dataset.action;if(a==='arrange')arrangeIcons();if(a==='open-files')openWindow('files');if(a==='toggle3d')toggle3D();if(a==='closeall')closeAll();ctx.style.display='none'});
+    const startBtn=$('#startBtn');const startMenu=$('#startMenu');startBtn.addEventListener('click',()=>{startMenu.classList.toggle('visible')});addEventListener('pointerdown',e=>{if(!startMenu.contains(e.target)&&e.target!==startBtn)startMenu.classList.remove('visible')});startMenu.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const act=b.dataset.act;if(act==='open-files')openWindow('files');if(act==='open-about')openWindow('about');if(act==='arrange')arrangeIcons();if(act==='toggle3d')toggle3D();if(act==='theme1')applyPreset('amber');if(act==='theme2')applyPreset('copper');if(act==='reset-layout'){localStorage.removeItem('iconPositions_orange');arrangeIcons()}if(act==='closeall')closeAll();startMenu.classList.remove('visible')});
+    function arrangeIcons(){const gapX=108,gapY=112;let x=18,y=64;const maxY=innerHeight-210;ICONS.forEach(m=>{const el=$('#icon-'+m.id);if(!el)return;setIconPos(el,x,y);y+=gapY;if(y>maxY){y=64;x+=gapX}});storePositions()}
+    function closeAll(){[...windows.keys()].forEach(closeWindow)}
+    function toggle3D(){prefs.three=!prefs.three;store.set('prefs',prefs);location.reload()}
+    function applyPreset(name){if(name==='amber'){prefs.colors={bg0:'#1a120b',bg1:'#120a06',panel:'#1f140e',edge:'#3b281b',accent:'#d97706',accent2:'#b45309',text:'#f3e7dc',muted:'#d1bfae',grid:'#2a1a12'}}else if(name==='copper'){prefs.colors={bg0:'#22130f',bg1:'#140b09',panel:'#23150f',edge:'#5a3a2a',accent:'#c57a44',accent2:'#8c5331',text:'#f2e6db',muted:'#d7c5b4',grid:'#3a241a'}}applyTheme(prefs.colors);store.set('prefs',prefs)}
+    const cursor=$('#cursor');let cx=innerWidth/2,cy=innerHeight/2,tx=cx,ty=cy;const coarse=matchMedia('(pointer: coarse)').matches;if(coarse){cursor.style.display='none';document.body.style.cursor='auto'}addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY},{passive:true});(function loop(){cx=lerp(cx,tx,0.25);cy=lerp(cy,ty,0.25);cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(loop)})()
+    function pointer(e){return{x:(e.touches?e.touches[0].clientX:e.clientX),y:(e.touches?e.touches[0].clientY:e.clientY)}}
+    addEventListener('keydown',e=>{if(e.key==='Escape'){const arr=[...windows.values()];if(arr.length){const top=arr.sort((a,b)=>(+b.style.zIndex)-(+a.style.zIndex))[0];const id=top.id.replace('win-','');closeWindow(id)}}});
+    function fileManagerHTML(){return`<div style='display:grid;gap:8px'><div style='display:flex;gap:8px;align-items:center'><button class='chip' data-fm='back'>←</button><button class='chip' data-fm='fwd'>→</button><button class='chip' data-fm='up'>↑</button><input class='chip' id='fmPath' value='/home/moad' style='flex:1;background:#20140e'/></div><div style='display:flex;gap:6px;margin-top:2px;flex-wrap:wrap'><button class='chip fm-tab active' data-tab='home'>Home</button><button class='chip fm-tab' data-tab='settings'>Settings</button><button class='chip fm-tab add' data-tab='add'>＋</button></div><div class='fm-panes' style='border:1px solid #5a3a22;border-radius:10px;background:#23170f;padding:10px'><div class='fm-pane' data-pane='home'>${fmGrid(ICONS.filter(x=>x.id!=='files').map(x=>x.label))}</div><div class='fm-pane' data-pane='settings' hidden>${settingsHTML()}</div></div></div>`}
+    function fmGrid(names){const folder=n=>`<div class='fm-item' style='text-align:center;user-select:none'><div class='fm-icon' style='width:64px;height:64px;margin:0 auto 6px;display:grid;place-items:center;background:#22160f;border:1px solid #4c311e;border-radius:12px'><svg viewBox='0 0 24 24' width='34' height='34' fill='var(--accent)'><path d='M10 4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h6z'/></svg></div><div class='fm-name' style='font-size:12px;color:#f7efe6'>${n}</div></div>`;return`<div class='fm-grid' style='display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px'>${names.map(folder).join('')}</div>`}
+    function settingsHTML(){return`<div style='display:grid;gap:10px'><div style='display:grid;grid-template-columns:1fr 1fr;gap:10px'><label class='chip' style='display:flex;align-items:center;gap:8px'>Accent<input type='color' id='setAccent' value='${prefs.colors.accent}' style='background:transparent;border:0;flex:1'></label><label class='chip' style='display:flex;align-items:center;gap:8px'>Accent 2<input type='color' id='setAccent2' value='${prefs.colors.accent2}' style='background:transparent;border:0;flex:1'></label><label class='chip' style='display:flex;align-items:center;gap:8px'>BG Top<input type='color' id='setBg0' value='${prefs.colors.bg0}' style='background:transparent;border:0;flex:1'></label><label class='chip' style='display:flex;align-items:center;gap:8px'>BG Bottom<input type='color' id='setBg1' value='${prefs.colors.bg1}' style='background:transparent;border:0;flex:1'></label><label class='chip' style='display:flex;align-items:center;gap:8px'>Grid<input type='range' id='setGrid' min='0' max='0.6' step='0.02' value='${prefs.grid}' style='flex:1'></label><label class='chip' style='display:flex;align-items:center;gap:8px'>3D<input type='checkbox' id='setThree' ${prefs.three?'checked':''}></label></div><div style='display:flex;gap:8px;flex-wrap:wrap'><button class='chip' data-theme='amber'>Preset: Amber</button><button class='chip' data-theme='copper'>Preset: Copper</button></div></div>`}
+    function initFileManager(win){const c=win.querySelector('.body');c.addEventListener('click',e=>{const t=e.target.closest('.fm-tab');if(t){c.querySelectorAll('.fm-tab').forEach(b=>b.classList.toggle('active',b===t));c.querySelectorAll('.fm-pane').forEach(p=>p.hidden=p.dataset.pane!==t.dataset.tab);if(t.dataset.tab==='add'){const id='tab'+Math.random().toString(36).slice(2,6);const btn=document.createElement('button');btn.className='chip fm-tab';btn.dataset.tab=id;btn.textContent='New';c.querySelector('.fm-tab.add').before(btn);const pane=document.createElement('div');pane.className='fm-pane';pane.dataset.pane=id;pane.innerHTML=fmGrid(['New_Folder','Notes']);c.querySelector('.fm-panes').appendChild(pane)}}const item=e.target.closest('.fm-item');if(item){const name=item.querySelector('.fm-name').textContent;if(/about/i.test(name))openWindow('about');if(/projects/i.test(name))openWindow('projects');if(/skills/i.test(name))openWindow('skills');if(/awards/i.test(name))openWindow('awards');if(/resume/i.test(name))openWindow('resume');if(/contact/i.test(name))openWindow('contact')}if(e.target.matches('[data-theme]')){applyPreset(e.target.dataset.theme)}});const acc=c.querySelector('#setAccent');const acc2=c.querySelector('#setAccent2');const bg0=c.querySelector('#setBg0');const bg1=c.querySelector('#setBg1');const grid=c.querySelector('#setGrid');const three=c.querySelector('#setThree');if(acc)acc.oninput=()=>{prefs.colors.accent=acc.value;applyTheme(prefs.colors);store.set('prefs',prefs)};if(acc2)acc2.oninput=()=>{prefs.colors.accent2=acc2.value;applyTheme(prefs.colors);store.set('prefs',prefs)};if(bg0)bg0.oninput=()=>{prefs.colors.bg0=bg0.value;applyTheme(prefs.colors);store.set('prefs',prefs)};if(bg1)bg1.oninput=()=>{prefs.colors.bg1=bg1.value;applyTheme(prefs.colors);store.set('prefs',prefs)};if(grid)grid.oninput=()=>{prefs.grid=parseFloat(grid.value);$('#fallbackGrid').style.opacity=prefs.grid;store.set('prefs',prefs)};if(three)three.onchange=()=>{prefs.three=three.checked;store.set('prefs',prefs)} }
+    arrangeIcons();
+    const ctxM=$('#ctxMenu');
+    addEventListener('keydown',e=>{if(e.key==='F1'){openWindow('files')}});
+  })();
+  </script>
+</body>
+</html>

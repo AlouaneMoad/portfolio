@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Desk</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { overflow: hidden; background: #000; }
+
+    :root {
+      --focus-x: 50%;
+      --focus-y: 60%;
+    }
+
+    .camera {
+      position: fixed;
+      inset: 0;
+      background-image: url('bg1.png');
+      background-size: cover;
+      background-position: center;
+      will-change: transform;
+      transform-origin: 50% 50%;
+    }
+    .camera.zoom {
+      transform-origin: var(--focus-x) var(--focus-y);
+      animation: camZoom 1s ease-in-out forwards;
+    }
+
+    @keyframes camZoom {
+      from { transform: scale(1); }
+      to   { transform: scale(2.7); }
+    }
+
+    /* ===== New Start button styles (replacing previous toggle) ===== */
+    .button {
+      --main-color: rgb(0, 0, 0);
+      --main-bg-color: rgba(0, 0, 0, 0.36);
+      --pattern-color: rgba(0, 0, 0, 0.073);
+
+      /* change this rotation value */
+      filter: hue-rotate(0deg);
+
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5rem;
+      background: radial-gradient(
+          circle,
+          var(--main-bg-color) 0%,
+          rgba(0, 0, 0, 0) 95%
+        ),
+        linear-gradient(var(--pattern-color) 1px, transparent 1px),
+        linear-gradient(to right, var(--pattern-color) 1px, transparent 1px);
+      background-size:
+        cover,
+        15px 15px,
+        15px 15px;
+      background-position:
+        center center,
+        center center,
+        center center;
+      border-image: radial-gradient(
+          circle,
+          var(--main-color) 0%,
+          rgba(0, 0, 0, 0) 100%
+        ) 1;
+      border-width: 1px 0 1px 0;
+      border-style: solid; /* ensure border-image renders */
+      color: var(--main-color);
+      padding: 1rem 3rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      transition: opacity .2s ease, background-size 0.2s ease-in-out, filter .2s ease;
+
+      /* keep original placement from prior design */
+      position: absolute;
+      top: 20%;
+      left: 51%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      user-select: none;
+    }
+
+    .button:hover {
+      background-size:
+        cover,
+        10px 10px,
+        10px 10px;
+    }
+    .button:active {
+      filter: hue-rotate(250deg);
+    }
+
+    /* === Booting overlay (appears after camZoom ends) === */
+    .boot-overlay {
+      position: fixed;          /* not scaled with .camera */
+      inset: 0;
+      display: grid;
+      place-items: center;/* top center */
+      padding-top: min(12vh, 120px);
+      z-index: 999;
+      pointer-events: none;     /* purely visual */
+      background: linear-gradient(180deg, rgba(0,0,0,.65), transparent 35%);
+    }
+    .boot-overlay[hidden] { display: none; }
+
+    .boot-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.6));
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .boot-text { font-weight: 700; font-size: 14px; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .camera.zoom { animation-duration: 0.001s; }
+      .spinner { animation-duration: 2.5s; } /* slower but still visible */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scene that zooms -->
+  <div class="camera" id="camera">
+    <button class="button" id="startBtn" type="button"> Click to run the computer</button>
+  </div>
+
+  <!-- Booting overlay (spinner ABOVE the text) -->
+  <div class="boot-overlay" id="bootOverlay" aria-live="polite" aria-busy="true" hidden>
+    <div class="boot-panel">
+      <div class="spinner" role="status" aria-label="Loading"></div>
+      <div class="boot-text">Booting…</div>
+    </div>
+  </div>
+
+  <script>
+    const camera   = document.getElementById('camera');
+    const btn      = document.getElementById('startBtn');
+    const overlay  = document.getElementById('bootOverlay');
+
+    function startSequence() {
+      // Avoid double-activations
+      btn.style.pointerEvents = 'none';
+
+      // Start zoom
+      camera.classList.add('zoom');
+
+      // Hide the button for a cleaner zoom
+      btn.style.opacity = '0';
+
+      // Redirect after some time (kept at 5s as before)
+      setTimeout(() => {
+        window.location.href = 'booting.html';
+      }, 5000);
+    }
+
+    // Show overlay AFTER camZoom finishes
+    camera.addEventListener('animationend', (e) => {
+      if (e.animationName === 'camZoom') {
+        overlay.hidden = false;
+      }
+    }, { once: true });
+
+    // Trigger
+    btn.addEventListener('click', startSequence, { once: true });
+  </script>
+</body>
+</html>

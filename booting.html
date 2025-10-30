@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Boot Journey Simulation (Windows → Linux Logs → malanux Login)</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --fg: #e6e6e6;
+      --muted: #9aa0a6;
+      --ok: #22c55e; /* green */
+      --malanux: #e95420; /* malanux orange */
+      --blue: #3b82f6; /* Windows-ish blue glow */
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, malanux, Cantarell, Noto Sans, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 600ms ease;
+    }
+    .screen.active { opacity: 1; pointer-events: auto; }
+
+    /* 1) Windows Boot Loader */
+    .win-boot { background: #000; }
+    .win-wrap { display:flex; flex-direction:column; align-items:center; gap:32px; }
+
+    .win-logo {
+      width: 140px; height: 140px; position: relative; filter: drop-shadow(0 0 12px rgba(59,130,246,0.45));
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .win-square { position:absolute; width:48%; height:48%; background: var(--blue); }
+    .sq1 { left:0; top:0; }
+    .sq2 { right:0; top:0; }
+    .sq3 { left:0; bottom:0; }
+    .sq4 { right:0; bottom:0; }
+    @keyframes pulse { 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.04);} }
+
+    .spinner {
+      width: 72px; height: 72px; display:grid; grid-template-columns: repeat(8,1fr);
+      gap: 4px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.15));
+    }
+    .spinner-dot { width: 8px; height: 8px; border-radius: 50%; background: #7aa7ff; opacity:.2; }
+    .spinner-dot:nth-child(odd) { opacity:.35; }
+    /* circular motion using rotation trick */
+    .spinner { position: relative; }
+    .spinner::before, .spinner::after { content:""; position:absolute; inset:0; margin:auto; width: 56px; height:56px; border-radius:50%; border: 3px solid rgba(122,167,255,0.22); border-top-color: rgba(122,167,255,0.7); animation: spin 1.6s linear infinite; }
+    .spinner::after { width:36px; height:36px; border-width: 3px; border-top-color: rgba(122,167,255,0.9); animation-duration: 0.9s; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 2) Linux/malanux Terminal Boot Logs */
+    .terminal { background: #000; padding: 48px 24px; align-content: start; }
+    .term-wrap { width:min(100%, 1100px); margin-inline:auto; }
+    .term-view {
+      height: 70vh; background: #000; border: 1px solid #222; border-radius: 12px;
+      padding: 18px; overflow: hidden; box-shadow: 0 0 0 1px #0d0d0d, 0 12px 32px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .term-title { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "malanux Mono", monospace; color: var(--muted); font-size: 13px; letter-spacing:.2px; margin-bottom: 10px; }
+    .term-lines {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "malanux Mono", monospace;
+      font-size: 14px; line-height: 1.55; color: #d4d4d4; height: 100%; overflow: hidden; white-space: pre-wrap;
+    }
+    .line { opacity: 0; transform: translateY(6px); transition: opacity 180ms ease, transform 180ms ease; }
+    .line.visible { opacity: 1; transform: translateY(0); }
+    .ok { color: var(--ok); font-weight: 600; }
+    .muted { color: #a3a3a3; }
+    .caret { display:inline-block; width:8px; background:#d4d4d4; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* 3) malanux Login Screen */
+    .login { background: radial-gradient(1000px 600px at 50% 20%, #111 0%, #0b0b0b 30%, #000 70%); }
+    .login-wrap { width:min(95%, 900px); margin-inline:auto; display:grid; gap: 24px; padding: 32px; }
+    .time {
+      text-align: center; font-size: clamp(22px, 4vw, 40px); font-weight: 600; letter-spacing: 1px; color: #fafafa;
+      text-shadow: 0 0 24px rgba(233,84,32,0.25);
+    }
+    .login-card {
+      margin-inline:auto; background: rgba(18,18,18,0.7); border: 1px solid #222; border-radius: 16px;
+      padding: 28px; width:min(100%, 520px); box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+    }
+    .user-icon{
+  width:84px; height:84px; border-radius:50%;
+  background: linear-gradient(180deg, #2b2b2b, #191919);
+  border:1px solid #2a2a2a; margin:0 auto 18px; position:relative;
+  overflow:hidden; /* keep image clipped to the circle */
+}
+
+/* The PNG goes here */
+.user-icon img{
+  width:100%; height:100%;
+  object-fit:cover;      /* fills the circle without distortion */
+  display:block;         /* removes inline-gap */
+  border-radius:50%;     /* keeps corners crisp on some browsers */
+}
+
+/* Your dashed ring, drawn on top */
+.user-icon::after{
+  content:""; position:absolute; inset:14px; border-radius:50%;
+  border:2px dashed rgba(255,255,255,0.06);
+  pointer-events:none;
+}
+.user-name{ text-align:center; font-weight:500; color:#eaeaea; margin-bottom:12px; }
+
+    .login-btn {
+      width: 100%; font-size: 15px; padding: 12px 14px; border-radius: 10px;
+      background: var(--malanux); border: 1px solid #c84a1c; color:#fff; outline: none;
+      font-weight: 600; cursor: pointer; transition: background-color 200ms ease;
+      margin-bottom: 12px;
+    }
+    .login-btn:hover { background-color: #d64a1b; }
+    .login-btn:focus-visible { box-shadow: 0 0 0 3px rgba(233,84,32,0.25); }
+
+
+    .brand { display:flex; justify-content:center; align-items:center; gap:10px; color:#f2f2f2; margin-top: 16px; }
+    .malanux-dot {
+      width: 12px; height:12px; border-radius:50%; background: var(--malanux);
+      box-shadow: 0 0 24px rgba(233,84,32,0.6);
+    }
+    .malanux-ring { width: 20px; height:20px; border-radius:50%; border:2px solid var(--malanux); opacity:.8; }
+
+    .footer { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 12px; color:#8a8a8a; }
+
+    /* Transitions */
+    .fade-in { animation: fIn .6s ease forwards; }
+    @keyframes fIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* Utility */
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+
+  <section id="win-boot" class="screen win-boot active" aria-label="Windows Boot Loader">
+    <div class="win-wrap">
+      <div class="win-logo" aria-hidden="true">
+        <div class="win-square sq1"></div>
+        <div class="win-square sq2"></div>
+        <div class="win-square sq3"></div>
+        <div class="win-square sq4"></div>
+      </div>
+      <div class="spinner" aria-hidden="true">
+        </div>
+    </div>
+  </section>
+
+  <section id="terminal" class="screen terminal" aria-label="Linux/malanux Boot Logs">
+    <div class="term-wrap">
+      <div class="term-title">/dev/ttyS0 — initramfs — dmesg &amp; systemd units</div>
+      <div class="term-view">
+        <div id="term-lines" class="term-lines" aria-live="polite" aria-atomic="false"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="login" class="screen login" aria-label="malanux Login Screen">
+    <div class="login-wrap fade-in">
+      <div id="clock" class="time" aria-live="polite">00:00</div>
+      <div class="login-card">
+        <div class="user-icon"><img src="avatar.png" alt="User avatar"></div>
+        <button id="login-btn" class="login-btn">Login</button>
+        <div class="brand" aria-label="malanux branding">
+          <span class="malanux-ring" aria-hidden="true"></span>
+          <span class="malanux-dot" aria-hidden="true"></span>
+          <strong>malanux</strong>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Press Login to continue</div>
+  </section>
+
+  <script>
+    // --- Configuration ---
+    const WINDOWS_BOOT_DURATION_MS = 4200;   // ~3–5s
+    const TERMINAL_LINE_INTERVAL_MS = 180;   // speed of log lines
+
+    // --- Helpers ---
+    const $ = (sel) => document.querySelector(sel);
+    const winBoot = $('#win-boot');
+    const terminal = $('#terminal');
+    const login = $('#login');
+
+    function show(el) { el.classList.add('active'); }
+    function hide(el) { el.classList.remove('active'); }
+
+    // Clock for login screen
+    function updateClock() {
+      const now = new Date();
+      const opts = { hour: '2-digit', minute: '2-digit' };
+      $('#clock').textContent = now.toLocaleTimeString([], opts);
+    }
+
+    // Terminal log generator
+    const lines = [
+      '[    0.000000] malanux version 6.8.0 (build@host) #33~22.04.1-malanux',
+      '[    0.000000] Command line: BOOT_IMAGE=/vmlinuz root=/dev/nvme0n1p3 ro quiet splash',
+      '[    0.000000] Kernel modules: loading…',
+      '[    0.001337] ACPI: Early table checksum verification disabled',
+      '[    0.004200] CPU0: Intel(R) Core(TM) Processor stepping 0x6',
+      '[    0.010000] Memory: 163840K/16777216K available (12288K kernel code)',
+      '[    0.014400] Mount-cache hash table entries: 524288 (order: 10, 8388608 bytes)',
+      '[    0.020000] Mountpoint-cache hash table entries: 524288 (order: 10, 8388608 bytes)',
+      '[    0.042000]   \u25CF systemd 252 (252.5-malanux.5) running in system mode.',
+      '[    0.042100] Detected virtualization: kvm',
+      '[ OK ] Reached target Paths.',
+      '[ OK ] Reached target Slices.',
+      '[ OK ] Listening on Journal Socket.',
+      '[ OK ] Mounted /boot/efi.',
+      '[ OK ] Mounted /tmp.',
+      '[ OK ] Started udev Coldplug all Devices.',
+      '[ OK ] Started Load/Save RF Kill Switch Status.',
+      '[ OK ] Started Load Kernel Modules.',
+      '[ OK ] Started Remount Root and Kernel File Systems.',
+      '[ OK ] Started Create Static Device Nodes in /dev.',
+      '[    1.200000] Loading kernel module: i915',
+      '[    1.240000] Loading kernel module: e1000e',
+      '[    1.340000] Network: bringing up interface enp3s0',
+      '[ OK ] Started Network Manager Script Dispatcher Service.',
+      '[ OK ] Started Authorization Manager.',
+      '[ OK ] Started Accounts Service.',
+      '[ OK ] Started Modem Manager.',
+      '[ OK ] Started Disk Manager.',
+      '[    2.000000] EXT4-fs (nvme0n1p3): mounted filesystem with ordered data mode. Opts: (null)',
+      '[    2.160000] systemd: Starting User Login Management…',
+      '[ OK ] Started GNOME Display Manager.',
+      '[ OK ] Reached target Graphical Interface.',
+      '[    2.900000] Boot complete in 2.9s (kernel) + 4.2s (userspace) = 7.1s',
+    ];
+
+    function renderLine(text) {
+      const c = document.createElement('div');
+      c.className = 'line';
+      // Colorize [ OK ] blocks
+      const html = text.replace(/\[\s*OK\s*\]/g, '<span class="ok">[ OK ]</span>');
+      c.innerHTML = html;
+      return c;
+    }
+
+    function startTerminalSequence() {
+      const container = document.getElementById('term-lines');
+      container.innerHTML = '';
+      let idx = 0;
+      const maxVisible = 18; // simulate scroll window height
+
+      const timer = setInterval(() => {
+        if (idx >= lines.length) {
+          clearInterval(timer);
+          // After a short pause, transition to login
+          setTimeout(() => { hide(terminal); show(login); updateClock(); }, 600);
+          return;
+        }
+        const node = renderLine(lines[idx++]);
+        container.appendChild(node);
+        requestAnimationFrame(() => node.classList.add('visible'));
+        // Trim to maintain a scroll-like effect
+        while (container.children.length > maxVisible) {
+          container.removeChild(container.firstChild);
+        }
+      }, TERMINAL_LINE_INTERVAL_MS);
+    }
+
+    // Keyboard shortcuts: allow user to skip stages quickly
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hide(winBoot); hide(terminal); show(login); updateClock();
+      }
+    });
+
+    // Event listener for the new login button
+    document.getElementById('login-btn').addEventListener('click', () => {
+      // Simulate a brief acceptance glow
+      const card = document.querySelector('.login-card');
+      card.style.boxShadow = '0 0 0 3px rgba(233,84,32,0.35), 0 24px 60px rgba(0,0,0,0.6)';
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        window.location = 'Desktop.html';
+      }, 300);
+    });
+
+    // Stage 1 → Stage 2 → Stage 3 flow
+    function startFlow() {
+      show(winBoot);
+      setTimeout(() => {
+        hide(winBoot); show(terminal);
+        // kick off typing/streaming of boot logs
+        startTerminalSequence();
+      }, WINDOWS_BOOT_DURATION_MS);
+    }
+
+    // Clock updater for login screen
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Ensure fonts settled, then start
+    window.addEventListener('load', startFlow);
+  </script>
+</body>
+</html>
