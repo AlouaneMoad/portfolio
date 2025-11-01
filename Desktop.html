@@ -4,26 +4,23 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Moad• Cybersecurity Portfolio</title>
-<link rel="icon" href="avatar.png" type="image/x-icon"/>
-<link rel="shortcut icon" href="avatar.png" type="image/x-icon"/>
+<link rel="icon" href="images/avatar.png" type="image/x-icon"/>
+<link rel="shortcut icon" href="images/avatar.png" type="image/x-icon"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-<!-- Added for Media Player -->
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Media Player Custom Styles */
   #volume-fill {
       transition: height 0.1s ease;
   }
   #media-player-widget {
       font-family: 'Inter', sans-serif;
-      cursor: auto; /* Override the body's cursor:none from main styles */
+      cursor: auto; 
   }
 </style>
-<!-- End Media Player additions -->
 
 <style>
   :root{
@@ -46,7 +43,7 @@
     color:var(--text);
     cursor:none;
     font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-    background-image: url('background.png');
+    background-image: url('images/background.png');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -276,7 +273,7 @@
           
           <div class="flex items-center space-x-3">
               <img 
-                  src="avatar.png" 
+                  src="images/avatar.png" 
                   onerror="this.src='https://placehold.co/80x80/1a202c/ffffff?text=ART'"
                   alt="Album Art"
                   class="w-20 h-20 rounded-md object-cover shadow-md flex-shrink-0"
@@ -407,11 +404,11 @@
   <!-- Added Media Player Script -->
   <script>
       const songs = [
-          'bgm1.mp3', 
-          'bgm2.mp3', 
-          'bgm3.mp3', 
-          'bgm4.mp3', 
-          'bgm5.mp3'
+          'sounds/bgm1.mp3', 
+          'sounds/bgm2.mp3', 
+          'sounds/bgm3.mp3', 
+          'sounds/bgm4.mp3', 
+          'sounds/bgm5.mp3'
       ];
       let currentSongIndex = 0;
 
@@ -555,7 +552,23 @@
       document.addEventListener('touchend', () => {
           isDragging = false;
       });
+
+      //click sound down
   </script>
-  <!-- End Media Player Script -->
+
+
+  <audio id="click-sound" src="sounds/click.mp3" preload="auto"></audio>
+
+  <script>
+
+      const clickSound = document.getElementById('click-sound');
+
+      document.addEventListener('click', () => {
+          clickSound.currentTime = 0;
+            
+          clickSound.play();
+      });
+  </script>
+
 </body>
 </html>

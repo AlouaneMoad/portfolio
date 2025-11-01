@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Desk</title>
-  <link rel="icon" href="avatar.png" type="image/x-icon"/>
-  <link rel="shortcut icon" href="avatar.png" type="image/x-icon"/>
+  <link rel="icon" href="images/avatar.png" type="image/x-icon"/>
+  <link rel="shortcut icon" href="images/avatar.png" type="image/x-icon"/>
   <style>
     html, body { height: 100%; margin: 0; padding: 0; }
     body { overflow: hidden; background: #000; }
@@ -18,7 +18,7 @@
     .camera {
       position: fixed;
       inset: 0;
-      background-image: url('bg1.png');
+      background-image: url('images/bg1.png');
       background-size: cover;
       background-position: center;
       will-change: transform;
@@ -215,11 +215,24 @@
           clearInterval(timer);
           window.location.href = 'booting.html';
         }
-      }, 100);
+      }, 30);
     }
 
     // Trigger the sequence when the button is clicked
     btn.addEventListener('click', startSequence, { once: true });
+  </script>
+
+  <audio id="click-sound" src="sounds/click.mp3" preload="auto"></audio>
+
+  <script>
+
+      const clickSound = document.getElementById('click-sound');
+
+      document.addEventListener('click', () => {
+          clickSound.currentTime = 0;
+            
+          clickSound.play();
+      });
   </script>
 </body>
 </html>

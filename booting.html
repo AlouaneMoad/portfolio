@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Boot Journey Simulation (Windows → Linux Logs → malanux Login)</title>
-  <link rel="icon" href="avatar.png" type="image/x-icon"/>
-  <link rel="shortcut icon" href="avatar.png" type="image/x-icon"/>
+  <link rel="icon" href="images/avatar.png" type="image/x-icon"/>
+  <link rel="shortcut icon" href="images/avatar.png" type="image/x-icon"/>
   <style>
     :root {
       --bg: #000000;
@@ -169,7 +169,7 @@
     <div class="login-wrap fade-in">
       <div id="clock" class="time" aria-live="polite">00:00</div>
       <div class="login-card">
-        <div class="user-icon"><img src="avatar.png" alt="User avatar"></div>
+        <div class="user-icon"><img src="images/avatar.png" alt="User avatar"></div>
         <button id="login-btn" class="login-btn">Login</button>
         <div class="brand" aria-label="malanux branding">
           <span class="malanux-ring" aria-hidden="true"></span>
@@ -183,8 +183,8 @@
 
   <script>
     // --- Configuration ---
-    const WINDOWS_BOOT_DURATION_MS = 4200;   // ~3–5s
-    const TERMINAL_LINE_INTERVAL_MS = 180;   // speed of log lines
+    const WINDOWS_BOOT_DURATION_MS = 1000;   // ~3–5s
+    const TERMINAL_LINE_INTERVAL_MS = 100;   // speed of log lines
 
     // --- Helpers ---
     const $ = (sel) => document.querySelector(sel);
@@ -238,6 +238,16 @@
       '[ OK ] Reached target Graphical Interface.',
       '[    2.900000] Boot complete in 2.9s (kernel) + 4.2s (userspace) = 7.1s',
     ];
+
+    function renderLine(text) {
+      const c = document.createElement('div');
+      c.className = 'line';
+      // Colorize [ OK ] blocks
+      const html = text.replace(/\[\s*OK\s*\]/g, '<span class="ok">[ OK ]</span>');
+      c.innerHTML = html;
+      return c;
+    }
+
 
     function renderLine(text) {
       const c = document.createElement('div');
@@ -306,6 +316,19 @@
 
     // Ensure fonts settled, then start
     window.addEventListener('load', startFlow);
+  </script>
+
+    <audio id="click-sound" src="sounds/click.mp3" preload="auto"></audio>
+
+  <script>
+
+      const clickSound = document.getElementById('click-sound');
+
+      document.addEventListener('click', () => {
+          clickSound.currentTime = 0;
+            
+          clickSound.play();
+      });
   </script>
 </body>
 </html>
