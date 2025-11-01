@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Boot Journey Simulation (Windows → Linux Logs → malanux Login)</title>
+  <title>Boot Journey Simulation (Windows → Linux Logs → Molanux Login)</title>
   <link rel="icon" href="images/avatar.png" type="image/x-icon"/>
   <link rel="shortcut icon" href="images/avatar.png" type="image/x-icon"/>
   <style>
@@ -12,7 +12,7 @@
       --fg: #e6e6e6;
       --muted: #9aa0a6;
       --ok: #22c55e; /* green */
-      --malanux: #e95420; /* malanux orange */
+      --Molanux: #e95420; /* Molanux orange */
       --blue: #3b82f6; /* Windows-ish blue glow */
     }
 
@@ -22,7 +22,7 @@
       margin: 0;
       background: var(--bg);
       color: var(--fg);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, malanux, Cantarell, Noto Sans, Arial, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Molanux, Cantarell, Noto Sans, Arial, sans-serif;
       overflow: hidden;
     }
 
@@ -59,7 +59,7 @@
     .spinner::after { width:36px; height:36px; border-width: 3px; border-top-color: rgba(122,167,255,0.9); animation-duration: 0.9s; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* 2) Linux/malanux Terminal Boot Logs */
+    /* 2) Linux/Molanux Terminal Boot Logs */
     .terminal { background: #000; padding: 48px 24px; align-content: start; }
     .term-wrap { width:min(100%, 1100px); margin-inline:auto; }
     .term-view {
@@ -67,9 +67,9 @@
       padding: 18px; overflow: hidden; box-shadow: 0 0 0 1px #0d0d0d, 0 12px 32px rgba(0,0,0,0.6);
       position: relative;
     }
-    .term-title { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "malanux Mono", monospace; color: var(--muted); font-size: 13px; letter-spacing:.2px; margin-bottom: 10px; }
+    .term-title { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Molanux Mono", monospace; color: var(--muted); font-size: 13px; letter-spacing:.2px; margin-bottom: 10px; }
     .term-lines {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "malanux Mono", monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Molanux Mono", monospace;
       font-size: 14px; line-height: 1.55; color: #d4d4d4; height: 100%; overflow: hidden; white-space: pre-wrap;
     }
     .line { opacity: 0; transform: translateY(6px); transition: opacity 180ms ease, transform 180ms ease; }
@@ -79,7 +79,7 @@
     .caret { display:inline-block; width:8px; background:#d4d4d4; animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* 3) malanux Login Screen */
+    /* 3) Molanux Login Screen */
     .login { background: radial-gradient(1000px 600px at 50% 20%, #111 0%, #0b0b0b 30%, #000 70%); }
     .login-wrap { width:min(95%, 900px); margin-inline:auto; display:grid; gap: 24px; padding: 32px; }
     .time {
@@ -116,7 +116,7 @@
 
     .login-btn {
       width: 100%; font-size: 15px; padding: 12px 14px; border-radius: 10px;
-      background: var(--malanux); border: 1px solid #c84a1c; color:#fff; outline: none;
+      background: var(--Molanux); border: 1px solid #c84a1c; color:#fff; outline: none;
       font-weight: 600; cursor: pointer; transition: background-color 200ms ease;
       margin-bottom: 12px;
     }
@@ -125,11 +125,11 @@
 
 
     .brand { display:flex; justify-content:center; align-items:center; gap:10px; color:#f2f2f2; margin-top: 16px; }
-    .malanux-dot {
-      width: 12px; height:12px; border-radius:50%; background: var(--malanux);
+    .Molanux-dot {
+      width: 12px; height:12px; border-radius:50%; background: var(--Molanux);
       box-shadow: 0 0 24px rgba(233,84,32,0.6);
     }
-    .malanux-ring { width: 20px; height:20px; border-radius:50%; border:2px solid var(--malanux); opacity:.8; }
+    .Molanux-ring { width: 20px; height:20px; border-radius:50%; border:2px solid var(--Molanux); opacity:.8; }
 
     .footer { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 12px; color:#8a8a8a; }
 
@@ -156,7 +156,7 @@
     </div>
   </section>
 
-  <section id="terminal" class="screen terminal" aria-label="Linux/malanux Boot Logs">
+  <section id="terminal" class="screen terminal" aria-label="Linux/Molanux Boot Logs">
     <div class="term-wrap">
       <div class="term-title">/dev/ttyS0 — initramfs — dmesg &amp; systemd units</div>
       <div class="term-view">
@@ -165,16 +165,16 @@
     </div>
   </section>
 
-  <section id="login" class="screen login" aria-label="malanux Login Screen">
+  <section id="login" class="screen login" aria-label="Molanux Login Screen">
     <div class="login-wrap fade-in">
       <div id="clock" class="time" aria-live="polite">00:00</div>
       <div class="login-card">
         <div class="user-icon"><img src="images/avatar.png" alt="User avatar"></div>
         <button id="login-btn" class="login-btn">Login</button>
-        <div class="brand" aria-label="malanux branding">
-          <span class="malanux-ring" aria-hidden="true"></span>
-          <span class="malanux-dot" aria-hidden="true"></span>
-          <strong>malanux</strong>
+        <div class="brand" aria-label="Molanux branding">
+          <span class="Molanux-ring" aria-hidden="true"></span>
+          <span class="Molanux-dot" aria-hidden="true"></span>
+          <strong>Molanux</strong>
         </div>
       </div>
     </div>
@@ -204,7 +204,7 @@
 
     // Terminal log generator
     const lines = [
-      '[    0.000000] malanux version 6.8.0 (build@host) #33~22.04.1-malanux',
+      '[    0.000000] Molanux version 6.8.0 (build@host) #33~22.04.1-Molanux',
       '[    0.000000] Command line: BOOT_IMAGE=/vmlinuz root=/dev/nvme0n1p3 ro quiet splash',
       '[    0.000000] Kernel modules: loading…',
       '[    0.001337] ACPI: Early table checksum verification disabled',
@@ -212,7 +212,7 @@
       '[    0.010000] Memory: 163840K/16777216K available (12288K kernel code)',
       '[    0.014400] Mount-cache hash table entries: 524288 (order: 10, 8388608 bytes)',
       '[    0.020000] Mountpoint-cache hash table entries: 524288 (order: 10, 8388608 bytes)',
-      '[    0.042000]   \u25CF systemd 252 (252.5-malanux.5) running in system mode.',
+      '[    0.042000]   \u25CF systemd 252 (252.5-Molanux.5) running in system mode.',
       '[    0.042100] Detected virtualization: kvm',
       '[ OK ] Reached target Paths.',
       '[ OK ] Reached target Slices.',
